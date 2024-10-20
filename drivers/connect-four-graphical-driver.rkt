@@ -8,9 +8,9 @@
 
 ;;; These will eventually be command line arguments.
 (define exe-1 "/Applications/Racket v8.14/bin/racket")
-(define args-1 '("connect-four-naive.rkt"))
+(define args-1 '("../naive_players/connect-four-naive.rkt"))
 (define exe-2 "/Users/justinhoang/anaconda3/bin/python3")
-(define args-2 '("connect-four-naive.py"))
+(define args-2 '("../naive_players/connect-four-naive.py"))
 
 ;;; (new-grid grid move player) -> (listof (listof (integer-in 0 2)))
 ;;;   grid : (listof (listof (integer-in 0 2)))
