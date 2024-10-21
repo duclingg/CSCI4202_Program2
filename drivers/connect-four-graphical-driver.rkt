@@ -7,8 +7,8 @@
 (define WIDTH 7)
 
 ;;; These will eventually be command line arguments.
-(define exe-1 "/Applications/Racket v8.14/bin/racket")
-(define args-1 '("../naive_players/connect-four-naive.rkt"))
+(define exe-1 "/Users/justinhoang/anaconda3/bin/python3")
+(define args-1 '("../Program2.py"))
 (define exe-2 "/Users/justinhoang/anaconda3/bin/python3")
 (define args-2 '("../naive_players/connect-four-naive.py"))
 
