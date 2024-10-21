@@ -22,7 +22,7 @@ def drop_piece(grid, col, piece):
     return -1
 
 def check_winner(grid, col, row, piece):
-    # Check horizontal
+    # check horizontal
     count = 0
     for c in range(max(0, col-3), min(width, col+4)):
         if grid[c][row] == piece:
@@ -32,12 +32,12 @@ def check_winner(grid, col, row, piece):
         else:
             count = 0
     
-    # Check vertical
+    # check vertical
     if row <= height - 4:
         if all(grid[col][row+i] == piece for i in range(4)):
             return True
     
-    # Check diagonal (positive slope)
+    # check diagonal (positive slope)
     count = 0
     for i in range(-3, 4):
         if 0 <= col+i < width and 0 <= row+i < height:
@@ -48,7 +48,7 @@ def check_winner(grid, col, row, piece):
             else:
                 count = 0
     
-    # Check diagonal (negative slope)
+    # check diagonal (negative slope)
     count = 0
     for i in range(-3, 4):
         if 0 <= col+i < width and 0 <= row-i < height:
@@ -66,7 +66,7 @@ def evaluate_position(grid):
     for col in range(width):
         for row in range(height):
             if grid[col][row] == player:
-                score += col + 1  # Prefer center columns
+                score += col + 1  # prefer center columns
             elif grid[col][row] == opponent:
                 score -= col + 1
     return score
