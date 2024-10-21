@@ -1,8 +1,6 @@
 import sys
 import json
-import math
-
-sys.stderr.write("Connect Four - Python with Alpha-Beta Pruning\n")
+import random
 
 player = int(sys.argv[2])
 width = int(sys.argv[4])
@@ -12,51 +10,66 @@ sys.stderr.write(f"player = {player}\n")
 sys.stderr.write(f" width = {width}\n")
 sys.stderr.write(f"height = {height}\n")
 
+opponent = 3 - player
+
 def valid_moves(grid):
     return [col for col in range(width) if grid[col][0] == 0]
 
-def make_move(grid, col, player):
-    new_grid = [column[:] for column in grid]
-    for row in range(height - 1, -1, -1):
-        if new_grid[col][row] == 0:
-            new_grid[col][row] = player
-            return new_grid
-    return None
+def drop_piece(grid, col, piece):
+    for row in range(height-1, -1, -1):
+        if grid[col][row] == 0:
+            return row
+    return -1
 
-def check_winner(grid, player):
+def check_winner(grid, col, row, piece):
     # Check horizontal
-    for row in range(height):
-        for col in range(width - 3):
-            if all(grid[col+i][row] == player for i in range(4)):
+    count = 0
+    for c in range(max(0, col-3), min(width, col+4)):
+        if grid[c][row] == piece:
+            count += 1
+            if count == 4:
                 return True
+        else:
+            count = 0
     
     # Check vertical
-    for col in range(width):
-        for row in range(height - 3):
-            if all(grid[col][row+i] == player for i in range(4)):
-                return True
+    if row <= height - 4:
+        if all(grid[col][row+i] == piece for i in range(4)):
+            return True
     
     # Check diagonal (positive slope)
-    for col in range(width - 3):
-        for row in range(height - 3):
-            if all(grid[col+i][row+i] == player for i in range(4)):
-                return True
+    count = 0
+    for i in range(-3, 4):
+        if 0 <= col+i < width and 0 <= row+i < height:
+            if grid[col+i][row+i] == piece:
+                count += 1
+                if count == 4:
+                    return True
+            else:
+                count = 0
     
     # Check diagonal (negative slope)
-    for col in range(width - 3):
-        for row in range(3, height):
-            if all(grid[col+i][row-i] == player for i in range(4)):
-                return True
+    count = 0
+    for i in range(-3, 4):
+        if 0 <= col+i < width and 0 <= row-i < height:
+            if grid[col+i][row-i] == piece:
+                count += 1
+                if count == 4:
+                    return True
+            else:
+                count = 0
     
     return False
 
 def evaluate_position(grid):
-    if check_winner(grid, player):
-        return 1000
-    elif check_winner(grid, 3 - player):
-        return -1000
-    else:
-        return 0
+    score = 0
+    for col in range(width):
+        for row in range(height):
+            if grid[col][row] == player:
+                score += col + 1  # Prefer center columns
+            elif grid[col][row] == opponent:
+                score -= col + 1
+    return score
 
 def alpha_beta(grid, depth, alpha, beta, maximizing_player):
     valid_moves_list = valid_moves(grid)
@@ -64,34 +77,57 @@ def alpha_beta(grid, depth, alpha, beta, maximizing_player):
         return evaluate_position(grid)
     
     if maximizing_player:
-        value = -math.inf
+        value = float('-inf')
         for move in valid_moves_list:
-            new_grid = make_move(grid, move, player)
-            value = max(value, alpha_beta(new_grid, depth - 1, alpha, beta, False))
+            row = drop_piece(grid, move, player)
+            grid[move][row] = player
+            if check_winner(grid, move, row, player):
+                grid[move][row] = 0
+                return float('inf')
+            value = max(value, alpha_beta(grid, depth - 1, alpha, beta, False))
+            grid[move][row] = 0
             alpha = max(alpha, value)
             if alpha >= beta:
                 break
         return value
     else:
-        value = math.inf
+        value = float('inf')
         for move in valid_moves_list:
-            new_grid = make_move(grid, move, 3 - player)
-            value = min(value, alpha_beta(new_grid, depth - 1, alpha, beta, True))
+            row = drop_piece(grid, move, opponent)
+            grid[move][row] = opponent
+            if check_winner(grid, move, row, opponent):
+                grid[move][row] = 0
+                return float('-inf')
+            value = min(value, alpha_beta(grid, depth - 1, alpha, beta, True))
+            grid[move][row] = 0
             beta = min(beta, value)
             if beta <= alpha:
                 break
         return value
 
 def best_move(grid):
-    best_score = -math.inf
-    best_move = None
-    for move in valid_moves(grid):
-        new_grid = make_move(grid, move, player)
-        score = alpha_beta(new_grid, 5, -math.inf, math.inf, False)
+    valid_moves_list = valid_moves(grid)
+    best_score = float('-inf')
+    best_moves = []
+    
+    for move in valid_moves_list:
+        row = drop_piece(grid, move, player)
+        grid[move][row] = player
+        
+        if check_winner(grid, move, row, player):
+            grid[move][row] = 0
+            return move
+        
+        score = alpha_beta(grid, 5, float('-inf'), float('inf'), False)
+        grid[move][row] = 0
+        
         if score > best_score:
             best_score = score
-            best_move = move
-    return best_move
+            best_moves = [move]
+        elif score == best_score:
+            best_moves.append(move)
+    
+    return random.choice(best_moves)
 
 for line in sys.stdin:
     sys.stderr.write(line)
