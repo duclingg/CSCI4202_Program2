@@ -12,9 +12,9 @@
 ;;; program, and (2) Player 2 uses the naive player source code interpreted by
 ;;; Racket.
 (define exe-1 "/Users/justinhoang/anaconda3/bin/python3")
-(define args-1 '("../Program2.py"))
+(define args-1 '("../HoangProgram2.py"))
 (define exe-2 "/Users/justinhoang/anaconda3/bin/python3")
-(define args-2 '("../naive_players/connect-four-naive.py"))
+(define args-2 '("../connect-four-smart-gh.py"))
 
 ;;; (new-grid grid move player) -> (listof (listof (integer-in 0 2)))
 ;;;   grid : (listof (listof (integer-in 0 2)))
